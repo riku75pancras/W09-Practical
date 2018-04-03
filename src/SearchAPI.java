@@ -1,5 +1,6 @@
 public class SearchAPI {
-    public void startFunctions(){
+    public void startFunctions(String searchCategory, String queryString, String cacheDirectoryPath){
+        
 
     }
 }
