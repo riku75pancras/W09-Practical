@@ -1,6 +1,5 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -31,12 +30,7 @@ public class SearchAPI {
         String urlString = stringBuilder.toString();
         URL url = new URL(urlString);
 
-        InputStream inputStream = url.openStream();
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(inputStream);
-        doc.getDocumentElement().normalize();
+        Document doc = createDocument(url);
 
         if (searchCategory.equals("publ")) {
             printPublicationInfo(doc);
@@ -57,6 +51,17 @@ public class SearchAPI {
         return searchCategory;
     }
 
+    private Document createDocument(URL url) throws IOException, ParserConfigurationException, SAXException {
+        InputStream inputStream = url.openStream();
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(inputStream);
+        doc.getDocumentElement().normalize();
+
+        return doc;
+    }
+
     private void printPublicationInfo(Document doc) throws XPathExpressionException {
         NodeList publications = doc.getElementsByTagName("info");
 
@@ -74,7 +79,7 @@ public class SearchAPI {
         }
     }
 
-    private void printAuthorInfo(Document doc) throws XPathExpressionException, IOException, ParserConfigurationException, SAXException {
+    private void printAuthorInfo(Document doc) throws IOException, XPathExpressionException, ParserConfigurationException, SAXException {
         NodeList authors = doc.getElementsByTagName("info");
 
         XPathFactory xpf = XPathFactory.newInstance();
@@ -89,13 +94,7 @@ public class SearchAPI {
             String url2 = (String) xpeURL.evaluate(authors.item(i), XPathConstants.STRING);
             URL url = new URL(url2 + ".xml");
 
-            //TODO: make this a method
-            InputStream inputStream = url.openStream();
-
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc2 = db.parse(inputStream);
-            doc2.getDocumentElement().normalize();
+            Document doc2 = createDocument(url);
 
             NodeList publicationsList = doc2.getElementsByTagName("r");
 
